@@ -1,0 +1,26 @@
+<table id="dataTable"></table>
+
+<script>
+  // Update the IP when you switch networks!!!!!
+  const socket = new WebSocket("ws://[put you IP here]:8765");
+
+  socket.onmessage = (event) => {
+    const lines = event.data.split("\n");
+    const table = document.getElementById("dataTable");
+    table.innerHTML = "";
+
+    lines.forEach(line => {
+      if (!line.trim()) return;
+      const parts = line.trim().split(":");
+      const row = document.createElement("tr");
+      const cell = document.createElement("td");
+      cell.textContent = parts.join(" ");
+      row.appendChild(cell);
+      table.appendChild(row);
+    });
+  };
+
+  socket.onerror = (error) => {
+    console.log("WebSocket error:", error);
+  };
+</script>
