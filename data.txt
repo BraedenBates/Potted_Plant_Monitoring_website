@@ -1,2 +1,2 @@
-Hi:Welcome:Home:User
-What:Happens:Now:???
+Peace Lily:PH:Moisture:Temperature:Light:Water
+Snake Plant:PH:Moisture:Temperature:Light:Water

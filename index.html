@@ -1,26 +1,246 @@
-<table id="dataTable"></table>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-Potted Plant Monitoring - Live Feed</title>
+  <style>
 
-<script>
-  // Update the IP when you switch networks!!!!!
-  const socket = new WebSocket("ws://[put you IP here]:8765");
+    :root {
+      --bg: #ffedcd;
+      --panel: #ff5733;
+      --purewhite: #FFFFFF;
+      --text: #000000;
+      --fs: clamp(12px, 1.5vw, 18px);
+    }
 
-  socket.onmessage = (event) => {
-    const lines = event.data.split("\n");
-    const table = document.getElementById("dataTable");
-    table.innerHTML = "";
+    * { box-sizing: border-box; }
 
-    lines.forEach(line => {
-      if (!line.trim()) return;
-      const parts = line.trim().split(":");
-      const row = document.createElement("tr");
-      const cell = document.createElement("td");
-      cell.textContent = parts.join(" ");
-      row.appendChild(cell);
-      table.appendChild(row);
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      overflow-x: hidden;
+    }
+
+    .stage {
+      position: relative;
+      width: var(--stage-w);
+      height: var(--stage-h);
+      min-height: var(--stage-min-h);
+      margin: 2vh auto;
+    }
+
+    .shape-a, .shape-b, .shape-c, .shape-d, .img, .cell { position: absolute; left: var(--x); top: var(--y); }
+    .shape-a { width: var(--w); height: var(--h); background: var(--panel); border-radius: 22px; z-index: 0; }
+    .shape-b { width: var(--w); height: var(--h); background: var(--panel); border-radius: 22px; z-index: 0; }
+    .shape-c { display: flex; flex-direction: row; width: var(--w); height: var(--h); background: var(--purewhite); z-index: 0; }
+    .shape-d { display: flex; flex-direction: row; width: var(--w); height: var(--h); background: var(--purewhite); z-index: 0; }
+    .img   { width: var(--w); z-index: 1; }
+    .cell  { font-size: var(--fs); color: var(--text); line-height: 1.2; white-space: nowrap; z-index: 10; }
+
+    /* Desktop Configuration */
+
+    /* Stage (the whole drawing area) */
+    .stage { --stage-w: min(92vw, 900px); --stage-h: min(78vh, 700px); --stage-min-h: 520px; }
+
+    /* Orange panel */
+    .shape-a { --x: 0%; --y: 3%; --w: clamp(55px, 11vw, 100px); --h: clamp(55px, 11vw, 100px) }
+    .shape-b { --x: 0%; --y: 43%; --w: clamp(55px, 11vw, 100px); --h: clamp(55px, 11vw, 100px) }
+    
+    /* Non-Orange */
+    .shape-c { --x: 74%; --y: 1%; --w: clamp(55px, 20vw, 500px); --h: clamp(55px, 8vw, 500px) }
+    .shape-d { --x: 74%; --y: 40%; --w: clamp(55px, 20vw, 500px); --h: clamp(55px, 8vw, 500px) }
+
+    /* Images */
+    .img-lily  { --x: 5%; --y: 8%;  --w: clamp(55px, 11vw, 100px); } 
+    .img-snake { --x: 5%; --y: 48%; --w: clamp(55px, 11vw, 100px); }
+
+    /* row 0 (line 1 of data.txt) */
+    .c00 { --x: 20%; --y: 5%; }  /* Title        */
+    .c01 { --x: 20%; --y: 14%; }  /* PH           */
+    .c02 { --x: 28%; --y: 14%; }  /* Moisture     */
+    .c03 { --x: 36%; --y: 14%; }  /* Temperature  */
+    .c04 { --x: 20%; --y: 24%; }  /* Light        */
+    .c05 { --x: 28%; --y: 24%; }  /* Water        */
+
+    /* row 1 (line 2 of data.txt) */
+    .c10 { --x: 20%; --y: 44%; }  /* Title        */
+    .c11 { --x: 20%; --y: 54%; }  /* PH           */
+    .c12 { --x: 28%; --y: 54%; }  /* Moisture     */
+    .c13 { --x: 36%; --y: 54%; }  /* Temperature  */
+    .c14 { --x: 20%; --y: 64%; }  /* Light        */
+    .c15 { --x: 28%; --y: 64%; }  /* Water        */
+    
+    /* mem 0 (line 1 of memory.txt) */
+    .m00 { --x: 50%; --y: 5%; }
+    .m01 { --x: 50%; --y: 14%; } 
+    .m02 { --x: 58%; --y: 14%; } 
+    .m03 { --x: 66%; --y: 14%; }
+    .m04 { --x: 50%; --y: 24%; } 
+    .m05 { --x: 58%; --y: 24%; }
+
+    /* mem 1 (line 2 of memory.txt) */
+    .m10 { --x: 50%; --y: 44%; }
+    .m11 { --x: 50%; --y: 54%; } 
+    .m12 { --x: 58%; --y: 54%; } 
+    .m13 { --x: 66%; --y: 54%; }
+    .m14 { --x: 50%; --y: 64%; } 
+    .m15 { --x: 58%; --y: 64%; }
+
+    .bars { position: absolute; left: var(--x); top: var(--y); width: 25%; height: 15%; display: flex; flex-direction: row; align-items: flex-end; gap: 18px; z-index: 10; }
+    .bar { flex: 1; background: var(--panel); border-radius: 6px 6px 0 0; }
+    .b0 { --x: 75%; --y: 5%; }
+    .b1 { --x: 75%; --y: 44%; }
+
+
+    @media (max-width: 700px) {
+      :root { --fs: clamp(11px, 2.6vw, 16px); }
+
+      .stage { --stage-w: 96vw; --stage-h: 74vh; --stage-min-h: 480px; }
+
+      .shape-a { --x: 10%; --y: 16%; --w: clamp(265px, 22vw, 500px); --h: clamp(30px, 11vw, 100px); }
+      .shape-b { --x: 10%; --y: 66%; --w: clamp(265px, 22vw, 500px); --h: clamp(30px, 11vw, 100px); }
+      .shape-c { --x: 70%; --y: 50%; --w: clamp(365px, 22vw, 500px); --h: clamp(30px, 11vw, 100px); }
+
+      .img-lily  { --x: 40%; --y: 10%;  }
+      .img-snake { --x: 40%; --y: 60%; }
+
+      /* Text row 0 (line 1 of data.txt) */
+      .c00 { --x: 40%; --y: 30%;  } /* Title        */
+      .c01 { --x: 20%; --y: 35%; }  /* PH           */
+      .c02 { --x: 28%; --y: 35%; }  /* Moisture     */
+      .c03 { --x: 46%; --y: 35%; }  /* Temperature  */
+      .c04 { --x: 20%; --y: 40%; }  /* Light        */
+      .c05 { --x: 34%; --y: 40%; }  /* Water        */
+
+      /* Text row 1 (line 2 of data.txt) */
+      .c10 { --x: 40%; --y: 80%;  } /* Title        */
+      .c11 { --x: 20%; --y: 85%; }  /* PH           */
+      .c12 { --x: 28%; --y: 85%; }  /* Moisture     */
+      .c13 { --x: 46%; --y: 85%; }  /* Temperature  */
+      .c14 { --x: 20%; --y: 90%; }  /* Light        */
+      .c15 { --x: 34%; --y: 90%; }  /* Water        */
+    }
+  </style>
+</head>
+
+<body>
+  <div class="stage">
+    <div class="shape-a"></div>
+    <div class="shape-b"></div>
+    <div class="shape-c"></div>
+    <div class="shape-d"></div>
+
+    <img src="snakeplant.png" class="img img-snake" alt="snake plant">
+    <img src="peacelily.png"  class="img img-lily"  alt="peace lily">
+
+    <div id="row0"></div>
+    <div id="row1"></div>
+
+    <div id="mem0"></div>
+    <div id="mem1"></div>
+    <div id="bars0" class="bars b0"></div>
+    <div id="bars1" class="bars b1"></div>
+  </div>
+
+  <script>
+    // !!!!!!! WARNING !!!!!!!
+    // WebSocket address. Change if the server's IP changes.
+    // To auto-use the address the page was opened from
+    const WS_URL = "ws://192.168.1.239:8765";
+
+    const socket = new WebSocket(WS_URL);
+
+    // Builds one row: splits a line by ":" and creates one cell per value.
+    // Each cell gets the class c{row}{column}, styled in the CSS above.
+    const buildRow = (line, containerId, rowIndex) => {
+      const container = document.getElementById(containerId);
+      container.replaceChildren();
+
+      (line ?? "")
+        .split(":")
+        .map((v) => v.trim())
+        .filter(Boolean)
+        .forEach((text, col) => {
+          const cell = document.createElement("div");
+          cell.className = `cell c${rowIndex}${col}`;
+          cell.textContent = text;
+          container.append(cell);
+        });
+    };
+
+    // Line 1 of data.txt -> row 0, line 2 -> row 1
+    socket.onmessage = (event) => {
+      const lines = String(event.data).split(/\r?\n/);
+      buildRow(lines[0], "row0", 0);
+      buildRow(lines[1], "row1", 1);
+    };
+
+    socket.onerror = (error) => console.warn("WebSocket error:", error);
+
+    const MEM_URL = "ws://192.168.1.239:8766";
+    const memSocket = new WebSocket(MEM_URL);
+
+    // AHHHHHH!!! PANIC! THIS IS A NEW
+    
+    const buildMemRow = (line, containerId, rowIndex) => {
+      const container = document.getElementById(containerId);
+      container.replaceChildren();
+
+      (line ?? "")
+        .split(":")
+        .map((v) => v.trim())
+        .filter(Boolean)
+        .forEach((text, col) => {
+          const cell = document.createElement("div");
+          cell.className = `cell m${rowIndex}${col}`;
+          cell.textContent = text;
+          container.append(cell);
+        });
+    };
+
+    memSocket.onmessage = (event) => {
+      const lines = String(event.data).split(/\r?\n/);
+      buildMemRow(lines[0], "mem0", 0);
+      buildMemRow(lines[1], "mem1", 1);
+    };
+
+    memSocket.onerror = (error) => console.warn("Memory WebSocket error:", error);
+    
+    // Now hes talking about how the bar will work 
+
+    const MAX_VAL = 100; // value that fills the bar completely
+
+    const buildBars = (line, containerId) => {
+      const container = document.getElementById(containerId);
+      container.replaceChildren();
+
+      (line ?? "")
+        .split(":")
+        .map((v) => parseFloat(v))
+        .forEach((num) => {
+          const bar = document.createElement("div");
+          bar.className = "bar";
+          const pct = Math.min(Math.max((num || 0) / MAX_VAL, 0), 1) * 100;
+          bar.style.height = pct + "%";
+          container.append(bar);
+        });
+    };
+
+    memSocket.addEventListener("message", (event) => {
+      const lines = String(event.data).split(/\r?\n/);
+      buildBars(lines[0], "bars0");
+      buildBars(lines[1], "bars1");
     });
-  };
-
-  socket.onerror = (error) => {
-    console.log("WebSocket error:", error);
-  };
-</script>
+  </script>
+</body>
+</html>
