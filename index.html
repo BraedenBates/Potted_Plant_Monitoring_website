@@ -156,7 +156,7 @@
     // !!!!!!! WARNING !!!!!!!
     // WebSocket address. Change if the server's IP changes.
     // To auto-use the address the page was opened from
-    const WS_URL = "ws://192.168.1.239:8765";
+    const WS_URL = "ws://[IP]:8765";
 
     const socket = new WebSocket(WS_URL);
 
@@ -187,7 +187,7 @@
 
     socket.onerror = (error) => console.warn("WebSocket error:", error);
 
-    const MEM_URL = "ws://192.168.1.239:8766";
+    const MEM_URL = "ws://[IP]:8766";
     const memSocket = new WebSocket(MEM_URL);
 
     // AHHHHHH!!! PANIC! THIS IS A NEW
