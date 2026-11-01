@@ -7,19 +7,27 @@
   <style>
 
     :root {
-      --bg: #ffedcd;
-      --panel: #ff5733;
+      --bg: #fffbdf;
+      --panel: #EF6905;
       --purewhite: #FFFFFF;
       --text: #000000;
       --fs: clamp(12px, 1.5vw, 18px);
+      --lightgreen: #fffbdf;
+      --green: #486C2F;
+      --topbar-h: 80px;
     }
 
     * { box-sizing: border-box; }
 
+    html {
+      overflow-y: scroll;
+      scrollbar-gutter: stable;
+    }
+
     html, body {
       margin: 0;
+      height: auto; min-height: 100%;
       width: 100%;
-      height: 100%;
       background: var(--bg);
       font-family: Arial, sans-serif;
     }
@@ -36,16 +44,40 @@
       width: var(--stage-w);
       height: var(--stage-h);
       min-height: var(--stage-min-h);
-      margin: 2vh auto;
+      margin: calc(var(--topbar-h) + 2vh) auto 20vh;
+      transition: margin-bottom 0.3s;
     }
 
-    .shape-a, .shape-b, .shape-c, .shape-d, .img, .cell { position: absolute; left: var(--x); top: var(--y); }
-    .shape-a { width: var(--w); height: var(--h); background: var(--panel); border-radius: 22px; z-index: 0; }
-    .shape-b { width: var(--w); height: var(--h); background: var(--panel); border-radius: 22px; z-index: 0; }
-    .shape-c { display: flex; flex-direction: row; width: var(--w); height: var(--h); background: var(--purewhite); z-index: 0; }
-    .shape-d { display: flex; flex-direction: row; width: var(--w); height: var(--h); background: var(--purewhite); z-index: 0; }
-    .img   { width: var(--w); z-index: 1; }
-    .cell  { font-size: var(--fs); color: var(--text); line-height: 1.2; white-space: nowrap; z-index: 10; }
+    .topbar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: var(--topbar-h);
+      background: var(--green);
+      z-index: 20;
+    }
+
+    .stage.has-open {
+      margin-bottom: 60vh;
+    }
+
+    .shape-a, .shape-b, .shape-c, .shape-d, .shape-e, .shape-f, .shape-g, .shape-h, .img, .cell {
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+    }
+
+    .shape-a { width: var(--w); height: var(--h); background: var(--panel); border-radius: 22px; z-index: 2; }
+    .shape-b { width: var(--w); height: var(--h); background: var(--panel); border-radius: 22px; z-index: 2; }
+    .shape-c { display: flex; flex-direction: row; width: var(--w); height: var(--h); background: var(--purewhite); z-index: 3; }
+    .shape-d { display: flex; flex-direction: row; width: var(--w); height: var(--h); background: var(--purewhite); z-index: 3; }
+    .shape-e { width: var(--w); height: var(--h); background: var(--lightgreen); border-radius: 22px; z-index: 1; }
+    .shape-f { width: var(--w); height: var(--h); background: var(--green); border-radius: 22px; z-index: 0; }
+    .shape-g { width: var(--w); height: var(--h); background: var(--lightgreen); border-radius: 22px; z-index: 1; }
+    .shape-h { width: var(--w); height: var(--h); background: var(--green); border-radius: 22px; z-index: 0; }
+    .img     { width: var(--w); z-index: 2; }
+    .cell    { font-size: var(--fs); color: var(--text); line-height: 1.2; white-space: nowrap; z-index: 10; }
 
     /* Desktop Configuration */
 
@@ -53,55 +85,87 @@
     .stage { --stage-w: min(92vw, 900px); --stage-h: min(78vh, 700px); --stage-min-h: 520px; }
 
     /* Orange panel */
-    .shape-a { --x: 0%; --y: 3%; --w: clamp(55px, 11vw, 100px); --h: clamp(55px, 11vw, 100px) }
+    .shape-a { --x: 0%; --y: 3%;  --w: clamp(55px, 11vw, 100px); --h: clamp(55px, 11vw, 100px) }
     .shape-b { --x: 0%; --y: 43%; --w: clamp(55px, 11vw, 100px); --h: clamp(55px, 11vw, 100px) }
-    
-    /* Non-Orange */
-    .shape-c { --x: 74%; --y: 1%; --w: clamp(55px, 20vw, 500px); --h: clamp(55px, 8vw, 500px) }
+
+    /* Bar Graph Background */
+    .shape-c { --x: 74%; --y: 1%;  --w: clamp(55px, 20vw, 500px); --h: clamp(55px, 8vw, 500px) }
     .shape-d { --x: 74%; --y: 40%; --w: clamp(55px, 20vw, 500px); --h: clamp(55px, 8vw, 500px) }
 
+    /* Light Green */
+    .shape-e { --x: -1%; --y: 1%;  --w: clamp(900px, 20vw, 2000px); --h: clamp(200px, 8vw, 500px) }
+    .shape-g { --x: -1%; --y: 41%;  --w: clamp(900px, 20vw, 2000px); --h: clamp(200px, 8vw, 500px) }
+
+    /* Green */
+    .shape-f { --x: -2%; --y: 0%;  --w: clamp(900px, 20vw, 2000px); --h: clamp(200px, 8vw, 500px) }
+    .shape-h { --x: -2%; --y: 40%;  --w: clamp(900px, 20vw, 2000px); --h: clamp(200px, 8vw, 500px) }
+
     /* Images */
-    .img-lily  { --x: 5%; --y: 8%;  --w: clamp(55px, 11vw, 100px); } 
+    .img-lily  { --x: 5%; --y: 8%;  --w: clamp(55px, 11vw, 100px); }
     .img-snake { --x: 5%; --y: 48%; --w: clamp(55px, 11vw, 100px); }
 
     /* row 0 (line 1 of data.txt) */
-    .c00 { --x: 20%; --y: 5%; }  /* Title        */
-    .c01 { --x: 20%; --y: 14%; }  /* PH           */
-    .c02 { --x: 28%; --y: 14%; }  /* Moisture     */
-    .c03 { --x: 36%; --y: 14%; }  /* Temperature  */
-    .c04 { --x: 20%; --y: 24%; }  /* Light        */
-    .c05 { --x: 28%; --y: 24%; }  /* Water        */
+    .c00 { --x: 20%; --y: 5%; }   /* Title        */
+    .c01 { --x: 20%; --y: 16%; }  /* PH           */
+    .c02 { --x: 28%; --y: 16%; }  /* Moisture     */
+    .c03 { --x: 42%; --y: 16%; }  /* Temperature  */
+    .c04 { --x: 60%; --y: 16%; }  /* Light        */
+    .c05 { --x: 75%; --y: 16%; }  /* Water        */
 
     /* row 1 (line 2 of data.txt) */
     .c10 { --x: 20%; --y: 44%; }  /* Title        */
-    .c11 { --x: 20%; --y: 54%; }  /* PH           */
-    .c12 { --x: 28%; --y: 54%; }  /* Moisture     */
-    .c13 { --x: 36%; --y: 54%; }  /* Temperature  */
-    .c14 { --x: 20%; --y: 64%; }  /* Light        */
-    .c15 { --x: 28%; --y: 64%; }  /* Water        */
-    
-    /* mem 0 (line 1 of memory.txt) */
-    .m00 { --x: 50%; --y: 5%; }
-    .m01 { --x: 50%; --y: 14%; } 
-    .m02 { --x: 58%; --y: 14%; } 
-    .m03 { --x: 66%; --y: 14%; }
-    .m04 { --x: 50%; --y: 24%; } 
-    .m05 { --x: 58%; --y: 24%; }
+    .c11 { --x: 20%; --y: 56%; }  /* PH           */
+    .c12 { --x: 28%; --y: 56%; }  /* Moisture     */
+    .c13 { --x: 42%; --y: 56%; }  /* Temperature  */
+    .c14 { --x: 60%; --y: 56%; }  /* Light        */
+    .c15 { --x: 75%; --y: 56%; }  /* Water        */
 
-    /* mem 1 (line 2 of memory.txt) */
-    .m10 { --x: 50%; --y: 44%; }
-    .m11 { --x: 50%; --y: 54%; } 
-    .m12 { --x: 58%; --y: 54%; } 
-    .m13 { --x: 66%; --y: 54%; }
-    .m14 { --x: 50%; --y: 64%; } 
-    .m15 { --x: 58%; --y: 64%; }
+    /* Memory matrix (memory.txt): class .m[row][column] */
+    /* Default grid position from row/column; :where() keeps it overridable by .m09 etc. */
+    .stage { --mx0: 0%; --my0: 100%; --mdx: 9%; --mdy: 5%; }
 
-    .bars { position: absolute; left: var(--x); top: var(--y); width: 25%; height: 15%; display: flex; flex-direction: row; align-items: flex-end; gap: 18px; z-index: 10; }
+    :where(.cell[class*=" m"]) {
+      --x: calc(var(--mx0) + var(--c) * var(--mdx));
+      --y: calc(var(--my0) + var(--r) * var(--mdy));
+    }
+
+    /* Column 9 text, placed under the row 0 labels (.c01-.c05) */
+    .m09 { --x: 20%; --y: 22%; }  /* under .c01 */
+    .m19 { --x: 28%; --y: 22%; }  /* under .c02 */
+    .m29 { --x: 42%; --y: 22%; }  /* under .c03 */
+    .m39 { --x: 60%; --y: 22%; }  /* under .c04 */
+    .m49 { --x: 75%; --y: 22%; }  /* under .c05 */
+
+    /* Column 9 text, placed under the row 1 labels (.c11-.c15) */
+    .m59 { --x: 20%; --y: 62%; }  /* under .c11 */
+    .m69 { --x: 28%; --y: 62%; }  /* under .c12 */
+    .m79 { --x: 42%; --y: 62%; }  /* under .c13 */
+    .m89 { --x: 60%; --y: 62%; }  /* under .c14 */
+    .m99 { --x: 75%; --y: 62%; }  /* under .c15 */
+
+    /* Bar graph */
+    .bars { position: absolute; left: var(--x); top: var(--y); width: 75%; height: 25%; display: flex; flex-direction: row; align-items: flex-end; gap: 18px; z-index: 10; }
     .bar { flex: 1; background: var(--panel); border-radius: 6px 6px 0 0; }
-    .b0 { --x: 75%; --y: 5%; }
-    .b1 { --x: 75%; --y: 44%; }
+    .b0 { --x: 3%; --y: 45%; gap: 12px; }
+    .b1 { --x: 3%; --y: 84%; gap: 12px; }
 
+    .group { flex: 1; height: 100%; display: flex; align-items: flex-end; gap: 1px; }
+    .group .bar { flex: 1; border-radius: 3px 3px 0 0; }
 
+    /* Drop-down tab */
+    .bars { display: none; }
+    .bars.open { display: flex; }
+
+    .toggle {
+      position: absolute;
+      left: 3%;
+      z-index: 10;
+      cursor: pointer;
+    }
+    .t0 { top: 30%; }
+    .t1 { top: 69%; }
+
+    /* Phone Configuration */
     @media (max-width: 700px) {
       :root { --fs: clamp(11px, 2.6vw, 16px); }
 
@@ -111,11 +175,11 @@
       .shape-b { --x: 10%; --y: 66%; --w: clamp(265px, 22vw, 500px); --h: clamp(30px, 11vw, 100px); }
       .shape-c { --x: 70%; --y: 50%; --w: clamp(365px, 22vw, 500px); --h: clamp(30px, 11vw, 100px); }
 
-      .img-lily  { --x: 40%; --y: 10%;  }
+      .img-lily  { --x: 40%; --y: 10%; }
       .img-snake { --x: 40%; --y: 60%; }
 
       /* Text row 0 (line 1 of data.txt) */
-      .c00 { --x: 40%; --y: 30%;  } /* Title        */
+      .c00 { --x: 40%; --y: 30%; }  /* Title        */
       .c01 { --x: 20%; --y: 35%; }  /* PH           */
       .c02 { --x: 28%; --y: 35%; }  /* Moisture     */
       .c03 { --x: 46%; --y: 35%; }  /* Temperature  */
@@ -123,22 +187,61 @@
       .c05 { --x: 34%; --y: 40%; }  /* Water        */
 
       /* Text row 1 (line 2 of data.txt) */
-      .c10 { --x: 40%; --y: 80%;  } /* Title        */
+      .c10 { --x: 40%; --y: 80%; }  /* Title        */
       .c11 { --x: 20%; --y: 85%; }  /* PH           */
       .c12 { --x: 28%; --y: 85%; }  /* Moisture     */
       .c13 { --x: 46%; --y: 85%; }  /* Temperature  */
       .c14 { --x: 20%; --y: 90%; }  /* Light        */
       .c15 { --x: 34%; --y: 90%; }  /* Water        */
     }
+
+    /* Row 1 shifts down by this amount when the top drop-down is open */
+    .stage { --shift-amt: 40%; }
+
+    /* Row 1 items only: m5x-m9x belong to row 1, m0x-m4x stay with row 0 */
+    .shape-b, .shape-d, .shape-g, .shape-h, .img-snake, .b1, .t1,
+    .cell[class*=" c1"],
+    .cell[class*=" m5"], .cell[class*=" m6"], .cell[class*=" m7"],
+    .cell[class*=" m8"], .cell[class*=" m9"] {
+      transition: top 0.3s;
+    }
+
+    .stage.shift-down .shape-b,
+    .stage.shift-down .shape-d,
+    .stage.shift-down .shape-g,
+    .stage.shift-down .shape-h,
+    .stage.shift-down .img-snake,
+    .stage.shift-down .cell[class*=" c1"],
+    .stage.shift-down .cell[class*=" m5"],
+    .stage.shift-down .cell[class*=" m6"],
+    .stage.shift-down .cell[class*=" m7"],
+    .stage.shift-down .cell[class*=" m8"],
+    .stage.shift-down .cell[class*=" m9"] {
+      top: calc(var(--y) + var(--shift-amt));
+    }
+
+    .stage.shift-down .b1 {
+      top: calc(84% + var(--shift-amt));
+    }
+
+    .stage.shift-down .t1 {
+      top: calc(69% + var(--shift-amt));
+    }
   </style>
 </head>
 
 <body>
+  <div class="topbar"></div>
   <div class="stage">
+    <button class="toggle t0" data-target="bars0">▼</button>
+    <button class="toggle t1" data-target="bars1">▼</button>
+
     <div class="shape-a"></div>
     <div class="shape-b"></div>
-    <div class="shape-c"></div>
-    <div class="shape-d"></div>
+    <div class="shape-e"></div>
+    <div class="shape-f"></div>
+    <div class="shape-g"></div>
+    <div class="shape-h"></div>
 
     <img src="snakeplant.png" class="img img-snake" alt="snake plant">
     <img src="peacelily.png"  class="img img-lily"  alt="peace lily">
@@ -146,8 +249,7 @@
     <div id="row0"></div>
     <div id="row1"></div>
 
-    <div id="mem0"></div>
-    <div id="mem1"></div>
+    <div id="mem"></div>
     <div id="bars0" class="bars b0"></div>
     <div id="bars1" class="bars b1"></div>
   </div>
@@ -155,7 +257,6 @@
   <script>
     // !!!!!!! WARNING !!!!!!!
     // WebSocket address. Change if the server's IP changes.
-    // To auto-use the address the page was opened from
     const WS_URL = "ws://[IP]:8765";
 
     const socket = new WebSocket(WS_URL);
@@ -190,56 +291,79 @@
     const MEM_URL = "ws://[IP]:8766";
     const memSocket = new WebSocket(MEM_URL);
 
-    // AHHHHHH!!! PANIC! THIS IS A NEW
-    
-    const buildMemRow = (line, containerId, rowIndex) => {
-      const container = document.getElementById(containerId);
-      container.replaceChildren();
-
-      (line ?? "")
-        .split(":")
-        .map((v) => v.trim())
-        .filter(Boolean)
-        .forEach((text, col) => {
-          const cell = document.createElement("div");
-          cell.className = `cell m${rowIndex}${col}`;
-          cell.textContent = text;
-          container.append(cell);
-        });
-    };
-
-    memSocket.onmessage = (event) => {
-      const lines = String(event.data).split(/\r?\n/);
-      buildMemRow(lines[0], "mem0", 0);
-      buildMemRow(lines[1], "mem1", 1);
-    };
-
     memSocket.onerror = (error) => console.warn("Memory WebSocket error:", error);
-    
-    // Now hes talking about how the bar will work 
 
+    // memory.txt: 10 lines, 10 values per line, separated by ":".
+    // Column 9 of every row is shown as text (.m09, .m19, ... .m99).
+    const buildMemMatrix = (lines) => {
+      const container = document.getElementById("mem");
+      container.replaceChildren();
+
+      for (let r = 0; r < 10; r++) {
+        const text = ((lines[r] ?? "").split(":")[9] ?? "").trim();
+        if (!text) continue;
+
+        const cell = document.createElement("div");
+        cell.className = `cell m${r}9`;
+        cell.style.setProperty("--r", r);
+        cell.style.setProperty("--c", 9);
+        cell.textContent = text;
+        container.append(cell);
+      }
+    };
+
+    // Grouped bar graph: group = column, color = row
     const MAX_VAL = 100; // value that fills the bar completely
+    const ROW_COLORS = ["#ff5733", "#3498db", "#2ecc71", "#f1c40f", "#9b59b6"];
 
-    const buildBars = (line, containerId) => {
+    const buildGroupedBars = (lines, containerId, startRow) => {
       const container = document.getElementById(containerId);
       container.replaceChildren();
 
-      (line ?? "")
-        .split(":")
-        .map((v) => parseFloat(v))
-        .forEach((num) => {
+      const rows = lines.slice(startRow, startRow + 5).map((l) =>
+        (l ?? "").split(":").map((v) => parseFloat(v))
+      );
+
+      for (let c = 0; c < 10; c++) {
+        const group = document.createElement("div");
+        group.className = "group";
+        for (let r = 0; r < 5; r++) {
+          const num = rows[r]?.[c];
           const bar = document.createElement("div");
           bar.className = "bar";
-          const pct = Math.min(Math.max((num || 0) / MAX_VAL, 0), 1) * 100;
-          bar.style.height = pct + "%";
-          container.append(bar);
-        });
+          bar.style.background = ROW_COLORS[r];
+          bar.style.height =
+            Math.min(Math.max((num || 0) / MAX_VAL, 0), 1) * 100 + "%";
+          group.append(bar);
+        }
+        container.append(group);
+      }
     };
 
     memSocket.addEventListener("message", (event) => {
       const lines = String(event.data).split(/\r?\n/);
-      buildBars(lines[0], "bars0");
-      buildBars(lines[1], "bars1");
+      buildMemMatrix(lines);
+      buildGroupedBars(lines, "bars0", 0);
+      buildGroupedBars(lines, "bars1", 5);
+    });
+
+    // Drop-down toggles
+    const stage = document.querySelector(".stage");
+
+    const syncStage = () => {
+      const open0 = document.getElementById("bars0").classList.contains("open");
+      const open1 = document.getElementById("bars1").classList.contains("open");
+      stage.classList.toggle("shift-down", open0);
+      stage.classList.toggle("has-open", open0 || open1);
+    };
+
+    document.querySelectorAll(".toggle").forEach((btn) => {
+      btn.onclick = () => {
+        const el = document.getElementById(btn.dataset.target);
+        el.classList.toggle("open");
+        btn.textContent = el.classList.contains("open") ? "▲" : "▼";
+        syncStage();
+      };
     });
   </script>
 </body>
