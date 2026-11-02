@@ -297,6 +297,9 @@
     // Column 9 of every row is shown as text (.m09, .m19, ... .m99).
     const buildMemMatrix = (lines) => {
       const container = document.getElementById("mem");
+      const idx = r === 0 ? 0 : 9;
+      const text = ((lines[r] ?? "").split(":")[idx] ?? "").trim();
+      
       container.replaceChildren();
 
       for (let r = 0; r < 10; r++) {
