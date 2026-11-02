@@ -255,9 +255,11 @@
   </div>
 
   <script>
-    // !!!!!!! WARNING !!!!!!!
-    // WebSocket address. Change if the server's IP changes.
-    const WS_URL = "ws://[IP]:8765";
+    // WebSocket addresses. Uses the same host the page was loaded from
+    // (Cloudflare URL), proxied by nginx to /ws and /mem.
+    const proto = location.protocol === "https:" ? "wss" : "ws";
+    const WS_URL  = `${proto}://${location.host}/ws`;
+    const MEM_URL = `${proto}://${location.host}/mem`;
 
     const socket = new WebSocket(WS_URL);
 
@@ -288,22 +290,20 @@
 
     socket.onerror = (error) => console.warn("WebSocket error:", error);
 
-    const MEM_URL = "ws://[IP]:8766";
     const memSocket = new WebSocket(MEM_URL);
 
     memSocket.onerror = (error) => console.warn("Memory WebSocket error:", error);
 
     // memory.txt: 10 lines, 10 values per line, separated by ":".
-    // Column 9 of every row is shown as text (.m09, .m19, ... .m99).
+    // Column 9 of every row is shown as text (.m09, .m19, ... .m99),
+    // except row 1 (Moisture), which shows column 1: the live value from the ESP32.
     const buildMemMatrix = (lines) => {
       const container = document.getElementById("mem");
-      const idx = r === 0 ? 0 : 9;
-      const text = ((lines[r] ?? "").split(":")[idx] ?? "").trim();
-      
       container.replaceChildren();
 
       for (let r = 0; r < 10; r++) {
-        const text = ((lines[r] ?? "").split(":")[9] ?? "").trim();
+        const col = r === 1 ? 1 : 9;
+        const text = ((lines[r] ?? "").split(":")[col] ?? "").trim();
         if (!text) continue;
 
         const cell = document.createElement("div");
