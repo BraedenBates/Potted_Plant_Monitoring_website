@@ -74,17 +74,23 @@ async def watch_memory():
 
 async def post_data(request):
     plants = await request.json()
-    moisture = str(plants[0]["moisture"])
+    p = plants[0]
+    new = [str(p["ph"]), str(p["moisture"]), str(p["temp"])]
 
     with open(MEM_FILE) as f:
         lines = f.read().splitlines()
+    while len(lines) < 3:
+        lines.append(":".join(["0"] * 10))
 
-    parts = lines[1].split(":")   # "Moisture:12:13:...:20"
-    parts[1] = moisture           # (1,1)
-    lines[1] = ":".join(parts)
+    for i, value in enumerate(new):
+        parts = lines[i].split(":")
+        if len(parts) != 10:
+            parts = ["0"] * 10
+        lines[i] = ":".join(parts[1:] + [value])   # shift left, newest in column 10
 
     with open(MEM_FILE, "w") as f:
         f.write("\n".join(lines))
+    print(f"ph={new[0]} moisture={new[1]} temp={new[2]}", flush=True)
     return web.Response(text="ok")
 
 
