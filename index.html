@@ -165,36 +165,6 @@
     .t0 { top: 30%; }
     .t1 { top: 69%; }
 
-    /* Phone Configuration */
-    @media (max-width: 700px) {
-      :root { --fs: clamp(11px, 2.6vw, 16px); }
-
-      .stage { --stage-w: 96vw; --stage-h: 74vh; --stage-min-h: 480px; }
-
-      .shape-a { --x: 10%; --y: 16%; --w: clamp(265px, 22vw, 500px); --h: clamp(30px, 11vw, 100px); }
-      .shape-b { --x: 10%; --y: 66%; --w: clamp(265px, 22vw, 500px); --h: clamp(30px, 11vw, 100px); }
-      .shape-c { --x: 70%; --y: 50%; --w: clamp(365px, 22vw, 500px); --h: clamp(30px, 11vw, 100px); }
-
-      .img-lily  { --x: 40%; --y: 10%; }
-      .img-snake { --x: 40%; --y: 60%; }
-
-      /* Text row 0 (line 1 of data.txt) */
-      .c00 { --x: 40%; --y: 30%; }  /* Title        */
-      .c01 { --x: 20%; --y: 35%; }  /* PH           */
-      .c02 { --x: 28%; --y: 35%; }  /* Moisture     */
-      .c03 { --x: 46%; --y: 35%; }  /* Temperature  */
-      .c04 { --x: 20%; --y: 40%; }  /* Light        */
-      .c05 { --x: 34%; --y: 40%; }  /* Water        */
-
-      /* Text row 1 (line 2 of data.txt) */
-      .c10 { --x: 40%; --y: 80%; }  /* Title        */
-      .c11 { --x: 20%; --y: 85%; }  /* PH           */
-      .c12 { --x: 28%; --y: 85%; }  /* Moisture     */
-      .c13 { --x: 46%; --y: 85%; }  /* Temperature  */
-      .c14 { --x: 20%; --y: 90%; }  /* Light        */
-      .c15 { --x: 34%; --y: 90%; }  /* Water        */
-    }
-
     /* Row 1 shifts down by this amount when the top drop-down is open */
     .stage { --shift-amt: 40%; }
 
@@ -226,6 +196,109 @@
 
     .stage.shift-down .t1 {
       top: calc(69% + var(--shift-amt));
+    }
+
+    /* Phone Configuration
+       Kept last so it overrides the desktop rules and the shift rules above.
+       Pixel-based layout: two stacked plant cards (banner, shelf + plant, 5 readings),
+       a drop-down button under each card, and a 5-reading graph inside each drop-down. */
+    @media (max-width: 700px) {
+      :root { --fs: clamp(12px, 3.2vw, 15px); --topbar-h: 56px; }
+
+      /* Stage height grows with the open drop-downs (+190px each) */
+      .stage {
+        --stage-w: 94vw;
+        --stage-h: 570px;
+        --stage-min-h: 0px;
+        --shift-amt: 190px;            /* row 1 shifts down by this when the top drop-down opens */
+        margin: calc(var(--topbar-h) + 16px) auto 40px;
+      }
+      .stage.has-open { margin-bottom: 40px; }
+      .stage.shift-down { --stage-h: 760px; }
+      .stage:has(#bars1.open) { --stage-h: 760px; }
+      .stage.shift-down:has(#bars1.open) { --stage-h: 950px; }
+
+      /* Banners: green (f, h) with light green (e, g) on top */
+      .shape-f { --x: -2%; --y: 0px;   --w: 104%; --h: 224px; }
+      .shape-e { --x: -1%; --y: 4px;   --w: 104%; --h: 224px; }
+      .shape-h { --x: -2%; --y: 284px; --w: 104%; --h: 224px; }
+      .shape-g { --x: -1%; --y: 288px; --w: 104%; --h: 224px; }
+
+      /* Orange shelf holding the plant name */
+      .shape-a { --x: 6%; --y: 86px;  --w: 88%; --h: 34px; }
+      .shape-b { --x: 6%; --y: 370px; --w: 88%; --h: 34px; }
+
+      /* Plants stand centered on the shelf */
+      .img { height: 68px; transform: translate(-50%, -100%); }
+      .img-lily  { --x: 50%; --y: 90px;  --w: auto; }
+      .img-snake { --x: 50%; --y: 374px; --w: auto; }
+
+      /* Titles centered on the shelf */
+      .c00, .c10 {
+        --x: 50%;
+        font-size: calc(var(--fs) + 2px);
+        font-weight: bold;
+        transform: translateX(-50%);
+      }
+
+      /* Labels (data.txt): PH, Moisture, Temperature on one line; Light, Water on the next */
+      .c00 { --y: 94px; }
+      .c01 { --x: 8%;  --y: 132px; }  /* PH           */
+      .c02 { --x: 38%; --y: 132px; }  /* Moisture     */
+      .c03 { --x: 68%; --y: 132px; }  /* Temperature  */
+      .c04 { --x: 8%;  --y: 176px; }  /* Light        */
+      .c05 { --x: 38%; --y: 176px; }  /* Water        */
+
+      .c10 { --y: 378px; }
+      .c11 { --x: 8%;  --y: 416px; }  /* PH           */
+      .c12 { --x: 38%; --y: 416px; }  /* Moisture     */
+      .c13 { --x: 68%; --y: 416px; }  /* Temperature  */
+      .c14 { --x: 8%;  --y: 460px; }  /* Light        */
+      .c15 { --x: 38%; --y: 460px; }  /* Water        */
+
+      /* Live values (memory.txt column 10), directly under each label */
+      .m09 { --x: 8%;  --y: 152px; }  /* under .c01 */
+      .m19 { --x: 38%; --y: 152px; }  /* under .c02 */
+      .m29 { --x: 68%; --y: 152px; }  /* under .c03 */
+      .m39 { --x: 8%;  --y: 196px; }  /* under .c04 */
+      .m49 { --x: 38%; --y: 196px; }  /* under .c05 */
+
+      .m59 { --x: 8%;  --y: 436px; }  /* under .c11 */
+      .m69 { --x: 38%; --y: 436px; }  /* under .c12 */
+      .m79 { --x: 68%; --y: 436px; }  /* under .c13 */
+      .m89 { --x: 8%;  --y: 480px; }  /* under .c14 */
+      .m99 { --x: 38%; --y: 480px; }  /* under .c15 */
+
+      /* Drop-down buttons: centered under each card */
+      .toggle {
+        left: 50%;
+        transform: translateX(-50%);
+        min-width: 84px;
+        height: 36px;
+        border: 0;
+        border-radius: 18px;
+        background: var(--green);
+        color: var(--purewhite);
+        font-size: 16px;
+      }
+      .t0 { top: 230px; }
+      .t1 { top: 514px; }
+      .stage.shift-down .t1 { top: calc(514px + var(--shift-amt)); }
+
+      /* Graphs: full width, white card, only the latest 5 readings (hides the oldest 5) */
+      .bars {
+        width: 94%;
+        height: 180px;
+        padding: 12px 10px 0;
+        gap: 10px;
+        background: var(--purewhite);
+        border-radius: 14px;
+      }
+      .b0 { --x: 3%; --y: 274px; }
+      .b1 { --x: 3%; --y: 558px; }
+      .stage.shift-down .b1 { top: calc(var(--y) + var(--shift-amt)); }
+      .group { gap: 2px; }
+      .group:nth-child(-n+5) { display: none; }
     }
   </style>
 </head>
@@ -316,8 +389,7 @@
     };
 
     // Grouped bar graph: group = column, color = row
-    //PH Moisture Temperature Light Water
-    const MAX_VALS = [16, 2000, 50, 100, 18]; // one max per row/color, in ROW_COLORS order
+    const MAX_VALS = [100, 50, 14, 100000, 100]; // one max per row/color, in ROW_COLORS order
     const ROW_COLORS = ["#ff5733", "#3498db", "#2ecc71", "#f1c40f", "#9b59b6"];
 
     const buildGroupedBars = (lines, containerId, startRow) => {
