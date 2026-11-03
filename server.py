@@ -75,7 +75,8 @@ async def watch_memory():
 async def post_data(request):
     plants = await request.json()
     p = plants[0]
-    new = [str(p["ph"]), str(p["moisture"]), str(p["temp"])]
+    temp_f = round(float(p["temp"]) * 9 / 5 + 32, 1)   # C -> F
+    new = [str(p["ph"]), str(p["moisture"]), str(temp_f)]
 
     with open(MEM_FILE) as f:
         lines = f.read().splitlines()
