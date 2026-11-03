@@ -94,9 +94,30 @@ async def post_data(request):
     return web.Response(text="ok")
 
 
+async def post_water(request):
+    body = await request.json()
+    value = str(body["water"])
+
+    with open(MEM_FILE) as f:
+        lines = f.read().splitlines()
+    while len(lines) < 5:
+        lines.append(":".join(["0"] * 10))
+
+    parts = lines[4].split(":")          # line 5 (index 4)
+    if len(parts) != 10:
+        parts = ["0"] * 10
+    lines[4] = ":".join(parts[1:] + [value])   # shift left, newest in column 10
+
+    with open(MEM_FILE, "w") as f:
+        f.write("\n".join(lines))
+    print(f"water={value}", flush=True)
+    return web.Response(text="ok")
+
+
 async def main():
     app = web.Application()
-    app.add_routes([web.post("/data", post_data)])
+    app.add_routes([web.post("/data", post_data),
+                    web.post("/water", post_water)])
     runner = web.AppRunner(app)
     await runner.setup()
     await web.TCPSite(runner, "0.0.0.0", 8080).start()

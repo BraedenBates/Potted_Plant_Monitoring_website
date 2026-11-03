@@ -316,7 +316,7 @@
     };
 
     // Grouped bar graph: group = column, color = row
-    const MAX_VAL = 100; // value that fills the bar completely
+    const MAX_VALS = [100, 50, 14, 100000, 100]; // one max per row/color, in ROW_COLORS order
     const ROW_COLORS = ["#ff5733", "#3498db", "#2ecc71", "#f1c40f", "#9b59b6"];
 
     const buildGroupedBars = (lines, containerId, startRow) => {
@@ -336,7 +336,7 @@
           bar.className = "bar";
           bar.style.background = ROW_COLORS[r];
           bar.style.height =
-            Math.min(Math.max((num || 0) / MAX_VAL, 0), 1) * 100 + "%";
+            Math.min(Math.max((num || 0) / MAX_VALS[r], 0), 1) * 100 + "%";
           group.append(bar);
         }
         container.append(group);
