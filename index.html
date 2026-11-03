@@ -198,10 +198,7 @@
       top: calc(69% + var(--shift-amt));
     }
 
-    /* Phone Configuration
-       Kept last so it overrides the desktop rules and the shift rules above.
-       Pixel-based layout: two stacked plant cards (banner, shelf + plant, 5 readings),
-       a drop-down button under each card, and a 5-reading graph inside each drop-down. */
+    /* Phone Configuration */
     @media (max-width: 700px) {
       :root { --fs: clamp(12px, 3.2vw, 15px); --topbar-h: 56px; }
 
@@ -389,7 +386,7 @@
     };
 
     // Grouped bar graph: group = column, color = row
-    const MAX_VALS = [100, 50, 14, 100000, 100]; // one max per row/color, in ROW_COLORS order
+    const MAX_VALS = [16, 2000, 100, 100, 18]; // one max per row/color, in ROW_COLORS order
     const ROW_COLORS = ["#ff5733", "#3498db", "#2ecc71", "#f1c40f", "#9b59b6"];
 
     const buildGroupedBars = (lines, containerId, startRow) => {
