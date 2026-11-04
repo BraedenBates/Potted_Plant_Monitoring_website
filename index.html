@@ -97,6 +97,9 @@
     .img     { width: var(--w); z-index: 2; }
     .cell    { font-size: var(--fs); color: var(--text); line-height: 1.2; white-space: nowrap; z-index: 10; }
 
+    /* Color square next to a label (same colors as the graph bars) */
+    .swatch { display: inline-block; width: 0.9em; height: 0.9em; margin-left: 6px; vertical-align: -0.1em; border-radius: 2px; }
+
     /* Desktop Configuration */
 
     /* Stage (the whole drawing area) */
@@ -370,6 +373,13 @@
           const cell = document.createElement("div");
           cell.className = `cell c${rowIndex}${col}`;
           cell.textContent = text;
+          // Line 1 of data.txt, columns 2-6: color square next to the label
+          if (rowIndex === 0 && col >= 1 && col <= 5) {
+            const sw = document.createElement("span");
+            sw.className = "swatch";
+            sw.style.background = ROW_COLORS[col - 1];
+            cell.append(sw);
+          }
           container.append(cell);
         });
     };
