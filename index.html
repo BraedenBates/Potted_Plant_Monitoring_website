@@ -373,8 +373,8 @@
           const cell = document.createElement("div");
           cell.className = `cell c${rowIndex}${col}`;
           cell.textContent = text;
-          // Line 1 of data.txt, columns 2-6: color square next to the label
-          if (rowIndex === 0 && col >= 1 && col <= 5) {
+          // Lines 1 and 2 of data.txt, columns 2-6: color square next to the label
+          if (col >= 1 && col <= 5) {
             const sw = document.createElement("span");
             sw.className = "swatch";
             sw.style.background = ROW_COLORS[col - 1];
@@ -421,6 +421,8 @@
     // Grouped bar graph: group = column, color = row
     const MAX_VALS = [16, 2000, 100, 100, 18]; // one max per row/color, in ROW_COLORS order
     const ROW_COLORS = ["#ff5733", "#3498db", "#2ecc71", "#f1c40f", "#9b59b6"];
+    const OVER_AT = 0.7;          // above 70% of MAX_VAL the top of the bar changes color
+    const OVER_COLOR = "#2b2b2b"; // color of that top part
 
     const buildGroupedBars = (lines, containerId, startRow) => {
       const container = document.getElementById(containerId);
@@ -437,9 +439,16 @@
           const num = rows[r]?.[c];
           const bar = document.createElement("div");
           bar.className = "bar";
-          bar.style.background = ROW_COLORS[r];
-          bar.style.height =
-            Math.min(Math.max((num || 0) / MAX_VALS[r], 0), 1) * 100 + "%";
+          const frac = Math.min(Math.max((num || 0) / MAX_VALS[r], 0), 1);
+          bar.style.height = frac * 100 + "%";
+          if (frac > OVER_AT) {
+            // Part of the bar above OVER_AT of the max gets the warning color
+            const cut = (OVER_AT / frac) * 100;   // % of the bar's own height
+            bar.style.background =
+              `linear-gradient(to top, ${ROW_COLORS[r]} ${cut}%, ${OVER_COLOR} ${cut}%)`;
+          } else {
+            bar.style.background = ROW_COLORS[r];
+          }
           group.append(bar);
         }
         container.append(group);
