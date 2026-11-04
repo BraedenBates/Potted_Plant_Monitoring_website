@@ -22,12 +22,18 @@ def read_memory():
         return f.read()
 
 
+pending_command = ""   # last R / A / S sent from the website, waiting for the ESP32
+
+
 async def handler(websocket):
+    global pending_command
     connected.add(websocket)
     try:
         await websocket.send(read_file())
-        async for _ in websocket:
-            pass
+        async for msg in websocket:
+            if msg in ("R", "A", "S"):
+                pending_command = msg
+                print(f"command={msg}", flush=True)
     finally:
         connected.remove(websocket)
 
@@ -115,10 +121,17 @@ async def post_water(request):
     return web.Response(text="ok")
 
 
+async def get_command(request):
+    global pending_command
+    cmd, pending_command = pending_command, ""   # hand out once, then clear
+    return web.Response(text=cmd)
+
+
 async def main():
     app = web.Application()
     app.add_routes([web.post("/data", post_data),
-                    web.post("/water", post_water)])
+                    web.post("/water", post_water),
+                    web.get("/command", get_command)])
     runner = web.AppRunner(app)
     await runner.setup()
     await web.TCPSite(runner, "0.0.0.0", 8080).start()

@@ -56,7 +56,25 @@
       height: var(--topbar-h);
       background: var(--green);
       z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
+
+    /* Pump command buttons (R / A / S) in the top bar */
+    .cmd {
+      min-width: 96px;
+      height: 40px;
+      border: 0;
+      border-radius: 20px;
+      background: var(--panel);
+      color: var(--purewhite);
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .cmd.sent { background: var(--lightgreen); color: var(--green); }
 
     .stage.has-open {
       margin-bottom: 60vh;
@@ -161,6 +179,13 @@
       left: 3%;
       z-index: 10;
       cursor: pointer;
+      min-width: 84px;
+      height: 36px;
+      border: 0;
+      border-radius: 18px;
+      background: var(--green);
+      color: var(--purewhite);
+      font-size: 16px;
     }
     .t0 { top: 30%; }
     .t1 { top: 69%; }
@@ -270,27 +295,21 @@
       .toggle {
         left: 50%;
         transform: translateX(-50%);
-        min-width: 84px;
-        height: 36px;
-        border: 0;
-        border-radius: 18px;
-        background: var(--green);
-        color: var(--purewhite);
-        font-size: 16px;
       }
       .t0 { top: 230px; }
       .t1 { top: 514px; }
       .stage.shift-down .t1 { top: calc(514px + var(--shift-amt)); }
 
-      /* Graphs: full width, white card, only the latest 5 readings (hides the oldest 5) */
+      /* Graphs: full width, only the latest 5 readings (hides the oldest 5) */
       .bars {
         width: 94%;
         height: 180px;
-        padding: 12px 10px 0;
         gap: 10px;
-        background: var(--purewhite);
-        border-radius: 14px;
       }
+
+      /* Command buttons fit three across */
+      .topbar { gap: 8px; }
+      .cmd { min-width: 88px; height: 36px; font-size: 14px; }
       .b0 { --x: 3%; --y: 274px; }
       .b1 { --x: 3%; --y: 558px; }
       .stage.shift-down .b1 { top: calc(var(--y) + var(--shift-amt)); }
@@ -301,7 +320,11 @@
 </head>
 
 <body>
-  <div class="topbar"></div>
+  <div class="topbar">
+    <button class="cmd" data-cmd="R">Manual</button>
+    <button class="cmd" data-cmd="A">Auto</button>
+    <button class="cmd" data-cmd="S">Stop</button>
+  </div>
   <div class="stage">
     <button class="toggle t0" data-target="bars0">▼</button>
     <button class="toggle t1" data-target="bars1">▼</button>
@@ -429,6 +452,16 @@
       stage.classList.toggle("shift-down", open0);
       stage.classList.toggle("has-open", open0 || open1);
     };
+
+    // Pump command buttons: send R / A / S to the Pi, which relays it to the ESP32
+    document.querySelectorAll(".cmd").forEach((btn) => {
+      btn.onclick = () => {
+        if (socket.readyState !== WebSocket.OPEN) return;
+        socket.send(btn.dataset.cmd);
+        btn.classList.add("sent");
+        setTimeout(() => btn.classList.remove("sent"), 400);
+      };
+    });
 
     document.querySelectorAll(".toggle").forEach((btn) => {
       btn.onclick = () => {
