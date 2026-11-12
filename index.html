@@ -165,13 +165,19 @@
     .m99 { --x: 75%; --y: 62%; }  /* under .c15 */
 
     /* Bar graph */
-    .bars { position: absolute; left: var(--x); top: var(--y); width: 75%; height: 25%; display: flex; flex-direction: row; align-items: flex-end; gap: 18px; z-index: 10; }
+    .bars { position: absolute; left: var(--x); top: var(--y); width: 75%; height: calc(25% + 40px); display: flex; flex-direction: row; align-items: flex-end; gap: 18px; z-index: 10; }
     .bar { flex: 1; background: var(--panel); border-radius: 6px 6px 0 0; }
-    .b0 { --x: 3%; --y: 45%; gap: 12px; }
-    .b1 { --x: 3%; --y: 84%; gap: 12px; }
+    .b0 { --x: 3%; --y: 45%; gap: 20px; }
+    .b1 { --x: 3%; --y: 84%; gap: 20px; }
 
-    .group { flex: 1; height: 100%; display: flex; align-items: flex-end; gap: 1px; }
-    .group .bar { flex: 1; border-radius: 3px 3px 0 0; }
+    .group { flex: 1; height: 100%; display: flex; align-items: flex-end; gap: 3px; }
+    .group .bar { width: 100%; flex: none; border-radius: 3px 3px 0 0; }
+
+    /* Each bar sits in a column with its % of MAX_VAL written above it */
+    .barwrap { flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
+    .pct { flex: none; width: 100%; height: 34px; padding-top: 3px; font-size: 11px; font-weight: bold; color: var(--text); white-space: nowrap;
+           transform-origin: 0 0; transform: translateX(11px) rotate(45deg); text-align: left; line-height: 1; }
+    .pct.over { color: #b00020; }
 
     /* Drop-down tab */
     .bars { display: none; }
@@ -194,7 +200,7 @@
     .t1 { top: 69%; }
 
     /* Row 1 shifts down by this amount when the top drop-down is open */
-    .stage { --shift-amt: 40%; }
+    .stage { --shift-amt: calc(40% + 40px); }
 
     /* Row 1 items only: m5x-m9x belong to row 1, m0x-m4x stay with row 0 */
     .shape-b, .shape-d, .shape-g, .shape-h, .img-snake, .b1, .t1,
@@ -235,13 +241,13 @@
         --stage-w: 94vw;
         --stage-h: 570px;
         --stage-min-h: 0px;
-        --shift-amt: 190px;            /* row 1 shifts down by this when the top drop-down opens */
+        --shift-amt: 230px;            /* row 1 shifts down by this when the top drop-down opens */
         margin: calc(var(--topbar-h) + 16px) auto 40px;
       }
       .stage.has-open { margin-bottom: 40px; }
-      .stage.shift-down { --stage-h: 760px; }
-      .stage:has(#bars1.open) { --stage-h: 760px; }
-      .stage.shift-down:has(#bars1.open) { --stage-h: 950px; }
+      .stage.shift-down { --stage-h: 800px; }
+      .stage:has(#bars1.open) { --stage-h: 800px; }
+      .stage.shift-down:has(#bars1.open) { --stage-h: 1030px; }
 
       /* Banners: green (f, h) with light green (e, g) on top */
       .shape-f { --x: -2%; --y: 0px;   --w: 104%; --h: 224px; }
@@ -255,8 +261,8 @@
 
       /* Plants stand centered on the shelf */
       .img { height: 68px; transform: translate(-50%, -100%); }
-      .img-lily  { --x: 50%; --y: 90px;  --w: auto; }
-      .img-snake { --x: 50%; --y: 374px; --w: auto; }
+      .img-lily  { --x: 50%; --y: 85px;  --w: auto; }
+      .img-snake { --x: 50%; --y: 369px; --w: auto; }
 
       /* Titles centered on the shelf */
       .c00, .c10 {
@@ -298,26 +304,42 @@
       .toggle {
         left: 50%;
         transform: translateX(-50%);
+        min-width: 120px;
+        height: 40px;
+        border-radius: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
       }
       .t0 { top: 230px; }
       .t1 { top: 514px; }
       .stage.shift-down .t1 { top: calc(514px + var(--shift-amt)); }
 
-      /* Graphs: full width, only the latest 5 readings (hides the oldest 5) */
+      /* Graphs: full width card, only the latest 4 readings (hides the 2 oldest) */
       .bars {
         width: 94%;
-        height: 180px;
-        gap: 10px;
+        height: 220px;
+        gap: 12px;
+        padding: 10px 22px 0 10px;   /* right padding leaves room for the angled % labels */
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 14px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
       }
 
       /* Command buttons fit three across */
-      .topbar { gap: 8px; }
-      .cmd { min-width: 88px; height: 36px; font-size: 14px; }
+      /* Top bar stays pinned so Manual / Auto / Stop are always reachable */
+      .topbar { position: fixed; gap: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); }
+      .cmd { min-width: 96px; height: 38px; font-size: 14px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); }
+      .cmd:active { transform: scale(0.96); }
       .b0 { --x: 3%; --y: 274px; }
       .b1 { --x: 3%; --y: 558px; }
       .stage.shift-down .b1 { top: calc(var(--y) + var(--shift-amt)); }
-      .group { gap: 2px; }
-      .group:nth-child(-n+5) { display: none; }
+      .group { gap: 3px; }
+      .group:nth-child(-n+3) { display: none; }
+      .pct { font-size: 9px; transform: translateX(4px) rotate(45deg); }
+
+      /* Live values: larger and bolder so they read at a glance */
+      .cell[class*=" m"] { font-size: calc(var(--fs) + 3px); font-weight: bold; }
+      .cell[class*=" c0"], .cell[class*=" c1"] { font-weight: 600; }
+      .c00, .c10 { font-weight: bold; }
     }
   </style>
 </head>
@@ -339,8 +361,8 @@
     <div class="shape-g"></div>
     <div class="shape-h"></div>
 
-    <img src="snakeplant.png" class="img img-snake" alt="snake plant">
-    <img src="peacelily.png"  class="img img-lily"  alt="peace lily">
+    <img src="peacelily.png" class="img img-snake" alt="snake plant">
+    <img src="snakeplant.png"  class="img img-lily"  alt="peace lily">
 
     <div id="row0"></div>
     <div id="row1"></div>
@@ -356,6 +378,10 @@
     const proto = location.protocol === "https:" ? "wss" : "ws";
     const WS_URL  = `${proto}://${location.host}/ws`;
     const MEM_URL = `${proto}://${location.host}/mem`;
+
+    // At Home Testing
+    //const WS_URL  = "ws://[IP]:8765";
+    //const MEM_URL = "ws://[IP]:8766";
 
     const socket = new WebSocket(WS_URL);
 
@@ -419,7 +445,7 @@
     };
 
     // Grouped bar graph: group = column, color = row
-    const MAX_VALS = [16, 2000, 100, 100, 18]; // one max per row/color, in ROW_COLORS order
+    const MAX_VALS = [16, 2000, 100, 100, 30]; // one max per row/color, in ROW_COLORS order
     const ROW_COLORS = ["#ff5733", "#3498db", "#2ecc71", "#f1c40f", "#9b59b6"];
     const OVER_AT = 0.7;          // above 70% of MAX_VAL the top of the bar changes color
     const OVER_COLOR = "#2b2b2b"; // color of that top part
@@ -432,15 +458,25 @@
         (l ?? "").split(":").map((v) => parseFloat(v))
       );
 
-      for (let c = 0; c < 10; c++) {
+      for (let c = 4; c < 10; c++) {
         const group = document.createElement("div");
         group.className = "group";
         for (let r = 0; r < 5; r++) {
-          const num = rows[r]?.[c];
+          //const num = rows[r]?.[c];
+          const raw = rows[r]?.[c];
+          const num = r === 4 ? Math.abs(MAX_VALS[4] - (raw || 0)) : raw;
+          const wrap = document.createElement("div");
+          wrap.className = "barwrap";
           const bar = document.createElement("div");
           bar.className = "bar";
-          const frac = Math.min(Math.max((num || 0) / MAX_VALS[r], 0), 1);
-          bar.style.height = frac * 100 + "%";
+          const rawFrac = (num || 0) / MAX_VALS[r];
+          const frac = Math.min(Math.max(rawFrac, 0), 1);
+          // Bar area = column height minus the 34px label strip at the bottom
+          bar.style.height = `calc((100% - 34px) * ${frac})`;
+          const pct = document.createElement("div");
+          pct.className = "pct" + (frac > OVER_AT ? " over" : "");
+          pct.textContent = Math.round(Math.max(rawFrac, 0) * 100) + "%";
+          pct.title = `${num ?? 0} / ${MAX_VALS[r]}`;
           if (frac > OVER_AT) {
             // Part of the bar above OVER_AT of the max gets the warning color
             const cut = (OVER_AT / frac) * 100;   // % of the bar's own height
@@ -449,7 +485,8 @@
           } else {
             bar.style.background = ROW_COLORS[r];
           }
-          group.append(bar);
+          wrap.append(bar, pct);
+          group.append(wrap);
         }
         container.append(group);
       }
