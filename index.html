@@ -170,7 +170,7 @@
     .b0 { --x: 3%; --y: 45%; gap: 20px; }
     .b1 { --x: 3%; --y: 84%; gap: 20px; }
 
-    .group { flex: 1; height: 100%; display: flex; align-items: flex-end; gap: 3px; }
+    .group { flex: 1; height: 100%; display: flex; align-items: flex-end; gap: 3px; border: 3px solid var(--green); border-radius: 14px; padding: 8px 22px 0 20px; }
     .group .bar { width: 100%; flex: none; border-radius: 3px 3px 0 0; }
 
     /* Each bar sits in a column with its % of MAX_VAL written above it */
@@ -313,15 +313,12 @@
       .t1 { top: 514px; }
       .stage.shift-down .t1 { top: calc(514px + var(--shift-amt)); }
 
-      /* Graphs: full width card, only the latest 4 readings (hides the 2 oldest) */
+      /* Graphs: full width card, only the latest reading */
       .bars {
         width: 94%;
         height: 220px;
         gap: 12px;
-        padding: 10px 22px 0 10px;   /* right padding leaves room for the angled % labels */
-        background: rgba(255, 255, 255, 0.7);
-        border-radius: 14px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        padding: 0;
       }
 
       /* Command buttons fit three across */
@@ -329,11 +326,11 @@
       .topbar { position: fixed; gap: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); }
       .cmd { min-width: 96px; height: 38px; font-size: 14px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); }
       .cmd:active { transform: scale(0.96); }
-      .b0 { --x: 3%; --y: 274px; }
-      .b1 { --x: 3%; --y: 558px; }
+      .b0 { --x: 5%; --y: 274px; }
+      .b1 { --x: 5%; --y: 558px; }
       .stage.shift-down .b1 { top: calc(var(--y) + var(--shift-amt)); }
-      .group { gap: 3px; }
-      .group:nth-child(-n+3) { display: none; }
+      .group { gap: 3px; padding: 6px 16px 0 20px; border-width: 2px; border-radius: 12px; }
+      .group:not(:last-child) { display: none; }
       .pct { font-size: 9px; transform: translateX(4px) rotate(45deg); }
 
       /* Live values: larger and bolder so they read at a glance */
@@ -380,8 +377,8 @@
     const MEM_URL = `${proto}://${location.host}/mem`;
 
     // At Home Testing
-    //const WS_URL  = "ws://[IP]:8765";
-    //const MEM_URL = "ws://[IP]:8766";
+    //const WS_URL  = "ws://:8765";
+    //const MEM_URL = "ws://:8766";
 
     const socket = new WebSocket(WS_URL);
 
@@ -458,7 +455,7 @@
         (l ?? "").split(":").map((v) => parseFloat(v))
       );
 
-      for (let c = 4; c < 10; c++) {
+      for (let c = 5; c < 10; c++) {
         const group = document.createElement("div");
         group.className = "group";
         for (let r = 0; r < 5; r++) {

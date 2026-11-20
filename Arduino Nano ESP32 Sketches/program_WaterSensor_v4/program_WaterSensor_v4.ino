@@ -20,7 +20,7 @@ const int echoPin = D3;
 
 // SETTINGS
 const float waterLimit = 15.0;          // cm
-const unsigned long wateringTime = 3000;
+const unsigned long wateringTime = 7000;
 const unsigned long checkInterval = 250;
 
 // VARIABLES
