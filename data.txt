@@ -1,2 +1,2 @@
-Croton Petra:PH:Moisture:Temperature:Light:Water
+Snake Plant:PH:Moisture:Temperature:Light:Water
 Peace Lily:PH:Moisture:Temperature:Light:Water
